@@ -1,0 +1,31 @@
+.board {
+  display: flex;
+  gap: 16px;
+}
+
+.column {
+  flex: 1;
+  padding: 16px;
+  border-radius: 12px;
+  min-height: 300px;
+}
+
+.column.todo {
+  background-color: #fff0f0b7;
+}
+
+.column.in-progress {
+  background-color: #f0ffe6b7;
+}
+
+.column.done {
+  background-color: #e6ffed;
+}
+
+.task {
+  background: rgba(255, 255, 255, 0.287);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}

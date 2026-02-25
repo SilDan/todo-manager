@@ -1,0 +1,48 @@
+<h1>Todo Manager</h1>
+
+<div style="display:flex; gap:8px; margin-bottom:12px;">
+  <input
+    type="text"
+    placeholder="New task title..."
+    [(ngModel)]="newTitle"
+    (keyup.enter)="add()"
+  />
+  <button (click)="add()">Add Task</button>
+</div>
+
+<div class="board">
+
+  <section class="column todo">
+    <h2>Ready</h2>
+    <div *ngFor="let task of todo" class="task">
+      <div>{{ task.title }}</div>
+      <button (click)="move(task.id, 'IN_PROGRESS')">
+        → In Progress
+      </button>
+    </div>
+  </section>
+
+  <section class="column in-progress">
+    <h2>In Progress</h2>
+    <div *ngFor="let task of inProgress" class="task">
+      <div>{{ task.title }}</div>
+      <button (click)="move(task.id, 'TODO')">
+        ← Ready
+      </button>
+      <button (click)="move(task.id, 'DONE')">
+        → Done
+      </button>
+    </div>
+  </section>
+
+  <section class="column done">
+    <h2>Done</h2>
+    <div *ngFor="let task of done" class="task">
+      <div>{{ task.title }}</div>
+      <button (click)="move(task.id, 'IN_PROGRESS')">
+        ← In Progress
+      </button>
+    </div>
+  </section>
+
+</div>
