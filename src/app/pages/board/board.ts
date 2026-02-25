@@ -22,7 +22,7 @@ export class Board {
   newTitle= '';
 
   tasks: Task[] = [
-    { id: crypto.randomUUID(), title: 'Task 1', description: 'Description for Task 1', status: 'TODO' }
+   //{ id: crypto.randomUUID(), title: 'Task 1', description: 'Description for Task 1', status: 'TODO' }
   ];
   
   get todo() {

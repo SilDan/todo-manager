@@ -3,29 +3,71 @@
   gap: 16px;
 }
 
+
+.task-input {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+ 
+  margin: 0 auto 26px;
+  padding: 14px 16px;
+  width: fit-content;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.task-input input {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.task-input button {
+  background-color: var(--input-button-bg);
+  color: var(--input-bg);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.task-input button:hover {
+  opacity: 0.85;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--title);
+}
+
 .column {
   flex: 1;
   padding: 16px;
   border-radius: 12px;
   min-height: 300px;
+  border: 1px solid var(--border);
 }
 
-.column.todo {
-  background-color: #fff0f0b7;
+.column.todo {  
+  background-color: var(--col-todo); 
 }
-
-.column.in-progress {
-  background-color: #f0ffe6b7;
+.column.in-progress { 
+  background-color: var(--col-inprogress); 
 }
-
-.column.done {
-  background-color: #e6ffed;
+.column.done { 
+  background-color: var(--col-done); 
 }
 
 .task {
-  background: rgba(255, 255, 255, 0.287);
-  padding: 10px;
+  background: var(--card);
+  padding: 1px solid var(--border);
   border-radius: 8px;
   margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px var(--shadow);
 }

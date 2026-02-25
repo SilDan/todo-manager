@@ -1,13 +1,13 @@
-<h1>Todo Manager</h1>
+<h1 class="title">Todo Manager</h1>
 
-<div style="display:flex; gap:8px; margin-bottom:12px;">
-  <input
+<div class="task-input">
+  <input 
     type="text"
-    placeholder="New task title..."
+    placeholder="What's the topic...?"
     [(ngModel)]="newTitle"
     (keyup.enter)="add()"
   />
-  <button (click)="add()">Add Task</button>
+  <button  (click)="add()">Go</button>
 </div>
 
 <div class="board">
@@ -46,3 +46,4 @@
   </section>
 
 </div>
+

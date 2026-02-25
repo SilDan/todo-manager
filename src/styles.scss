@@ -1,1 +1,53 @@
-/* You can add global styles to this file, and also import other style files */
+/* Light Theme */
+:root {
+  --bg: #bef0f3a3;
+  --text: #313437;
+  --title: #474849;
+
+  --card: #f5f5f5;  
+  --border: #e5e7eb;
+
+  --col-todo: #f4b2b2b7;
+  --col-inprogress: #dedc7db7; 
+  --col-done: #92de7db7;
+
+  --input-bg: #ffffff;
+  --input-text: #111827;
+  --input-border: #e5e7eb;
+  --input-button-bg: #1b1f25;
+
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme */
+.dark-mode {
+  --bg: #0b1220;
+  --text: #99a3a5;
+  --title: #ffffff;
+
+  --card: var(--shadow);  
+  --border: #263244;
+
+  --col-todo: #553056;
+  --col-inprogress: #403556;
+  --col-done: #272754;
+
+  --input-bg: #1e293b;
+  --input-text: #ffffff;
+  --input-border: #334155;
+  --input-button-bg: #6682af;
+  
+  --shadow: rgba(0, 0, 0, 0.35);
+}
+
+html, body {
+  height: 100%;
+}
+
+
+body {
+  margin: 0;  
+  background: var(--bg);
+  color: var(--text);
+  font-family:  system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
