@@ -1,15 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-type Status = 'TODO' | 'IN_PROGRESS' | 'DONE';
-
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  status: Status;
-};
+import { TodoService, Task , Status } from '../../api/todos';
 
 @Component({
   selector: 'app-board',
@@ -17,15 +9,29 @@ type Task = {
   templateUrl: './board.html',
   styleUrls: ['./board.scss'],
 })
-export class Board {
+export class Board implements OnInit {
 
   newTitle= '';
 
   tasks: Task[] = [
    //{ id: crypto.randomUUID(), title: 'Task 1', description: 'Description for Task 1', status: 'TODO' }
   ];
+
+  constructor(private readonly todoService: TodoService) {}
   
-  get todo() {
+   ngOnInit(): void {
+    this.reload();
+  }
+  
+
+  private reload(): void {
+    this.todoService.getTodos().subscribe(todos => {
+      // Backend liefert kein description -> default setzen
+      this.tasks = todos.map(t => ({ ...t, description: (t as any).description ?? '' }));
+    });
+  }
+
+  get task() {
     return this.tasks.filter(task => task.status === 'TODO');
   }
 
@@ -41,18 +47,18 @@ export class Board {
     const title = this.newTitle.trim();
     if (!title) return;
 
-    this.tasks = [
-      ...this.tasks,
-      { id: crypto.randomUUID(), title, description: '', status: 'TODO' }
-    ];
+    this.todoService.createTodo(title).subscribe(() => {
+      this.reload();
+    });
     
     this.newTitle = '';
   }
 
+
   move(id: string, status: Status): void {
-  this.tasks = this.tasks.map((task) =>
-    task.id === id ? { ...task, status } : task
-  );
+    this.todoService.updateTodo(id, status).subscribe(updated => {
+      this.tasks = this.tasks.map(t => t.id === id ? { ...t, ...updated } : t);
+    });
+  }
 }
 
-}

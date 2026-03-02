@@ -14,7 +14,7 @@
 
   <section class="column todo">
     <h2>Ready</h2>
-    <div *ngFor="let task of todo" class="task">
+    <div *ngFor="let task of task" class="task">
       <div>{{ task.title }}</div>
       <button (click)="move(task.id, 'IN_PROGRESS')">
         → In Progress
