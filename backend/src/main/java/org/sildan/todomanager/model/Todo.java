@@ -1,10 +1,18 @@
 package org.sildan.todomanager.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="todos")
 public class Todo {
 
+    @Id
     private String id;
     private String title;
     private String status;
+
 
     public Todo() {
     }

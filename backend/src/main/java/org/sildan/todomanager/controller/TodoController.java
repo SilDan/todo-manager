@@ -1,6 +1,7 @@
 package org.sildan.todomanager.controller;
 
 import org.sildan.todomanager.model.Todo;
+import org.sildan.todomanager.repository.TodoRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -11,11 +12,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TodoController {
 
     private static final String INITIAL_STATE = "TODO";
-    private final Map<String, Todo> todos = new ConcurrentHashMap<>();
+    private final TodoRepository repo;
+
+    public TodoController(TodoRepository repo) {
+        this.repo = repo;
+    }
 
     @GetMapping
     public Collection<Todo> getAll() {
-        return todos.values();
+        return repo.findAll();
     }
 
     /**
@@ -34,8 +39,7 @@ public class TodoController {
     public Todo create(@RequestBody Todo todo) {
         String id = UUID.randomUUID().toString();
         Todo newTodo = new Todo(id, todo.getTitle(), INITIAL_STATE);
-        todos.put(id, newTodo);
-        return newTodo;
+        return repo.save(newTodo);
     }
 
 
@@ -55,13 +59,9 @@ public class TodoController {
             @PathVariable String id,
             @RequestBody Map<String, String> body) {
 
-        Todo existing = todos.get(id);
-        if (existing == null) {
-            throw new RuntimeException("Todo not found");
-        }
-
+        Todo existing = repo.findById(id).orElseThrow();
         existing.setStatus(body.get("status"));
-        return existing;
+        return repo.save(existing);
     }
 
 }
