@@ -2,6 +2,7 @@ package org.sildan.todomanager.controller;
 
 import org.sildan.todomanager.model.Todo;
 import org.sildan.todomanager.repository.TodoRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -18,6 +19,27 @@ public class TodoController {
         this.repo = repo;
     }
 
+    /**
+     * Get all todo items. This endpoint returns a list of all existing todo items in the system. Each item includes its ID, title, and current status.
+     * <strong>Example response:</strong>
+     * <pre>
+     * {code
+     * [
+     *      {
+     *          "id": "123e4567-e89b-12d3-a456-426614174000",
+     *          "title": "Always smile at work :)",
+     *          "status": "TODO"
+     *      },
+     *      {
+     *          "id": "123e4567-e89b-12d3-a456-426614174001",
+     *          "title": "Finish project and find some friends ;)",
+     *          "status": "IN_PROGRESS"
+     *      }
+     * ]
+     * }
+     * </pre>
+     * @return A collection of all {@link Todo} items currently stored in the system, each with its ID, title, and status.
+     */
     @GetMapping
     public Collection<Todo> getAll() {
         return repo.findAll();
@@ -29,7 +51,7 @@ public class TodoController {
      * Example request body:
      * {
      *  "title": "Buy groceries"
-     *  }
+     * }
      *
      *
      * @param todo The todo item to create, containing at least a "title" field.
@@ -62,6 +84,19 @@ public class TodoController {
         Todo existing = repo.findById(id).orElseThrow();
         existing.setStatus(body.get("status"));
         return repo.save(existing);
+    }
+
+    /**
+     * Delete a todo item by its ID. This endpoint removes the specified todo item from the system. If the item with the given ID does not exist, an error will be thrown.
+     * @param id The ID of the todo item to delete.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        if(!repo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        repo.deleteById(id);
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
 }
