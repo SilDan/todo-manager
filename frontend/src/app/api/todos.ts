@@ -32,5 +32,8 @@ export class TodoService  {
     return this.http.patch<Task>(`${this.baseUrl}/${id}`, { status });
   } 
 
+  deleteTodo(id: string) {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 
 }

@@ -1,49 +1,78 @@
-<h1 class="title">Todo Manager</h1>
+<h1 class="title">Todo Board</h1>
 
 <div class="task-input">
-  <input 
+  <input
     type="text"
-    placeholder="What's the topic...?"
     [(ngModel)]="newTitle"
+    placeholder="Neue Aufgabe..."
     (keyup.enter)="add()"
   />
-  <button  (click)="add()">Go</button>
+
+  <button (click)="add()">Add</button>
 </div>
 
-<div class="board">
+<div class="columns">
+  <!-- TODO -->
+  <section
+    class="column todo"
+    cdkDropList
+    #todoList="cdkDropList"
+    [cdkDropListData]="todoTasks"
+    [cdkDropListConnectedTo]="[inProgressList, doneList, trashList]"
+    (cdkDropListDropped)="drop($event, 'TODO')"
+  >
+    <h3>TODO</h3>
 
-  <section class="column todo">
-    <h2>Ready</h2>
-    <div *ngFor="let task of task" class="task">
-      <div>{{ task.title }}</div>
-      <button (click)="move(task.id, 'IN_PROGRESS')">
-        → In Progress
-      </button>
+    <div class="task" *ngFor="let task of todoTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
+      <div class="title">{{ task.title }}</div>
+      <div class="desc">{{ task.description }}</div>
     </div>
   </section>
 
-  <section class="column in-progress">
-    <h2>In Progress</h2>
-    <div *ngFor="let task of inProgress" class="task">
-      <div>{{ task.title }}</div>
-      <button (click)="move(task.id, 'TODO')">
-        ← Ready
-      </button>
-      <button (click)="move(task.id, 'DONE')">
-        → Done
-      </button>
+  <!-- IN_PROGRESS -->
+  <section
+    class="column in-progress"
+    cdkDropList
+    #inProgressList="cdkDropList"
+    [cdkDropListData]="inProgressTasks"
+    [cdkDropListConnectedTo]="[todoList, doneList, trashList]"
+    (cdkDropListDropped)="drop($event, 'IN_PROGRESS')"
+  >
+    <h3>IN PROGRESS</h3>
+
+    <div class="task" *ngFor="let task of inProgressTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
+      <div class="title">{{ task.title }}</div>
+      <div class="desc">{{ task.description }}</div>
     </div>
   </section>
 
-  <section class="column done">
-    <h2>Done</h2>
-    <div *ngFor="let task of done" class="task">
-      <div>{{ task.title }}</div>
-      <button (click)="move(task.id, 'IN_PROGRESS')">
-        ← In Progress
-      </button>
+  <!-- DONE -->
+  <section
+    class="column done"
+    cdkDropList
+    #doneList="cdkDropList"
+    [cdkDropListData]="doneTasks"
+    [cdkDropListConnectedTo]="[todoList, inProgressList, trashList]"
+    (cdkDropListDropped)="drop($event, 'DONE')"
+  >
+    <h3>DONE</h3>
+
+    <div class="task" *ngFor="let task of doneTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
+      <div class="title">{{ task.title }}</div>
+      <div class="desc">{{ task.description }}</div>
     </div>
   </section>
 
+  <!-- TRASH -->
+  <aside
+    class="trash"
+    cdkDropList
+    #trashList="cdkDropList"
+    [cdkDropListData]="trashData"
+    [cdkDropListEnterPredicate]="canDropToTrash"
+    (cdkDropListDropped)="trashDropped($event)"
+  >
+    <div class="trash__icon">🗑️</div>
+    <div class="trash__label">Papierkorb</div>
+  </aside>
 </div>
-

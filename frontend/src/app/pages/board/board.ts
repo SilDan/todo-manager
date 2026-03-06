@@ -1,64 +1,136 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TodoService, Task , Status } from '../../api/todos';
+
+import { 
+  DragDropModule, 
+  CdkDrag,
+  CdkDragDrop, 
+  moveItemInArray, 
+  transferArrayItem, 
+} from '@angular/cdk/drag-drop';
+
+import { TodoService, Task, Status } from '../../api/todos';
 
 @Component({
   selector: 'app-board',
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './board.html',
   styleUrls: ['./board.scss'],
 })
 export class Board implements OnInit {
 
-  newTitle= '';
+  newTitle = '';
 
-  tasks: Task[] = [
-   //{ id: crypto.randomUUID(), title: 'Task 1', description: 'Description for Task 1', status: 'TODO' }
-  ];
+  /** Flat list from backend (optional but useful for debugging / future features). */
+  tasks: Task[] = [];
 
-  constructor(private readonly todoService: TodoService) {}
-  
-   ngOnInit(): void {
+  /** Stable arrays for CDK Drag&Drop (must NOT be getters that create new arrays). */
+  todoTasks: Task[] = [];
+  inProgressTasks: Task[] = [];
+  doneTasks: Task[] = [];
+  trashData: Task[] = []; 
+
+  constructor(private readonly todoService: TodoService, private readonly cdr: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
     this.reload();
   }
-  
 
   private reload(): void {
     this.todoService.getTodos().subscribe(todos => {
       // Backend liefert kein description -> default setzen
-      this.tasks = todos.map(t => ({ ...t, description: (t as any).description ?? '' }));
+      const mapped = todos.map(t => ({ ...t, description: (t as any).description ?? '' }));
+
+      this.tasks = mapped;
+
+      // build stable lists for DnD
+      this.todoTasks = mapped.filter(t => t.status === 'TODO');
+      this.inProgressTasks = mapped.filter(t => t.status === 'IN_PROGRESS');
+      this.doneTasks = mapped.filter(t => t.status === 'DONE');
+
+      this.cdr.detectChanges(); // Force update to avoid ExpressionChangedAfterItHasBeenCheckedError after async update
     });
-  }
-
-  get task() {
-    return this.tasks.filter(task => task.status === 'TODO');
-  }
-
-  get inProgress() {
-    return this.tasks.filter(task => task.status === 'IN_PROGRESS');
-  }
-
-  get done() {
-    return this.tasks.filter(task => task.status === 'DONE');
   }
 
   add(): void {
     const title = this.newTitle.trim();
     if (!title) return;
 
-    this.todoService.createTodo(title).subscribe(() => {
-      this.reload();
-    });
-    
+    this.todoService.createTodo(title).subscribe(() => this.reload());
     this.newTitle = '';
   }
 
-
   move(id: string, status: Status): void {
-    this.todoService.updateTodo(id, status).subscribe(updated => {
-      this.tasks = this.tasks.map(t => t.id === id ? { ...t, ...updated } : t);
+    this.todoService.updateTodo(id, status).subscribe({
+      next: () => this.reload(),
+      error: (err) => {
+        console.error('Update status failed', err);
+        this.reload();
+      }
     });
   }
+
+  /**
+   * Handle drag & drop:
+   * - same container: reorder only
+   * - different container: move item + update status in backend
+   */
+  drop(event: CdkDragDrop<Task[]>, targetStatus: Status): void {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      return;
+    }
+
+    transferArrayItem(
+      event.previousContainer.data,
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    const movedTask = event.container.data[event.currentIndex];
+
+    // IMPORTANT: status must become the target column's status
+    this.move(movedTask.id, targetStatus);
+  }
+
+  trackById(_: number, t: Task): string {
+    return t.id;
+  }
+
+  // Only allow drops if there is actual drag data
+canDropToTrash = (drag: CdkDrag<Task>, _drop: any) => {
+  return !!drag.data?.id;
+};
+
+trashDropped(event: CdkDragDrop<Task[]>): void {
+  const task = event.item.data as Task | undefined;
+  if (!task?.id) return;
+
+  const ok = confirm(`"${task.title}" really delete?`);
+  if (!ok) {
+    this.reload();
+    return;
+  }
+
+  this.removeFromColumns(task.id);
+
+  this.todoService.deleteTodo(task.id).subscribe({
+    next: () => this.reload(),
+    error: (err) => {
+      console.error('Delete failed', err);
+      this.reload();
+      alert('Delete failed - item was restored to board');
+    },
+  });
+}
+
+private removeFromColumns(id: string): void {
+  this.todoTasks = this.todoTasks.filter(t => t.id !== id);
+  this.inProgressTasks = this.inProgressTasks.filter(t => t.id !== id);
+  this.doneTasks = this.doneTasks.filter(t => t.id !== id);
+}
 }
 
