@@ -508,3 +508,57 @@ Caused by: org.h2.mvstore.MVStoreException: The file is locked: C:/dev/fullstack
 	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:81)
 	at org.h2.mvstore.MVStore.<init>(MVStore.java:291)
 	... 56 more
+2026-03-06 14:18:33.216318+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax Fehler in SQL Befehl "SELECT*FROM [*]: TODOS"; erwartet "identifier"
+Syntax error in SQL statement "SELECT*FROM [*]: TODOS"; expected "identifier"; SQL statement:
+SELECT*FROM : TODOS [42001-240]
+2026-03-06 14:20:39.653168+01:00 database: flush
+org.h2.message.DbException: General error: "org.h2.mvstore.MVStoreException: The file is locked: C:/dev/fullstack/todo-manager/backend/data/tododb.mv.db [2.4.240/7]" [50000-240]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.message.DbException.convert(DbException.java:407)
+	at org.h2.mvstore.db.Store.lambda$new$0(Store.java:122)
+	at org.h2.mvstore.MVStore.handleException(MVStore.java:1675)
+	at org.h2.mvstore.MVStore.panic(MVStore.java:502)
+	at org.h2.mvstore.MVStore.<init>(MVStore.java:296)
+	at org.h2.mvstore.MVStore$Builder.open(MVStore.java:2164)
+	at org.h2.mvstore.db.Store.<init>(Store.java:133)
+	at org.h2.engine.Database.<init>(Database.java:328)
+	at org.h2.engine.Engine.openSession(Engine.java:92)
+	at org.h2.engine.Engine.openSession(Engine.java:222)
+	at org.h2.engine.Engine.createSession(Engine.java:201)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:350)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:124)
+	at org.h2.Driver.connect(Driver.java:59)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCConnectionOpener.run(JDBCConnectionOpener.java:112)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCConnectionOpener.run(JDBCConnectionOpener.java:86)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCDataSource.openConnection(JDBCDataSource.java:213)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCDataSource.openConnection(JDBCDataSource.java:131)
+	at org.jkiss.dbeaver.ext.generic.model.GenericDataSource.openConnection(GenericDataSource.java:158)
+	at org.jkiss.dbeaver.ext.h2.model.H2DataSource.openConnection(H2DataSource.java:72)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCExecutionContext.connect(JDBCExecutionContext.java:110)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCRemoteInstance.lambda$initializeMainContext$0(JDBCRemoteInstance.java:105)
+	at org.jkiss.dbeaver.model.exec.DBExecUtils.tryOpenContext(DBExecUtils.java:1098)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCRemoteInstance.initializeMainContext(JDBCRemoteInstance.java:104)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCRemoteInstance.<init>(JDBCRemoteInstance.java:59)
+	at org.jkiss.dbeaver.model.impl.jdbc.JDBCDataSource.initializeRemoteInstance(JDBCDataSource.java:123)
+	at org.jkiss.dbeaver.ext.generic.model.GenericDataSource.<init>(GenericDataSource.java:124)
+	at org.jkiss.dbeaver.ext.h2.model.H2DataSource.<init>(H2DataSource.java:41)
+	at org.jkiss.dbeaver.ext.h2.model.H2MetaModel.createDataSourceImpl(H2MetaModel.java:56)
+	at org.jkiss.dbeaver.ext.generic.GenericDataSourceProvider.openDataSource(GenericDataSourceProvider.java:58)
+	at org.jkiss.dbeaver.registry.DataSourceDescriptor.openDataSource(DataSourceDescriptor.java:1356)
+	at org.jkiss.dbeaver.registry.DataSourceDescriptor.connect0(DataSourceDescriptor.java:1214)
+	at org.jkiss.dbeaver.registry.DataSourceDescriptor.connect(DataSourceDescriptor.java:1048)
+	at org.jkiss.dbeaver.runtime.jobs.ConnectJob.run(ConnectJob.java:79)
+	at org.jkiss.dbeaver.model.runtime.AbstractJob.run(AbstractJob.java:110)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientException: General error: "org.h2.mvstore.MVStoreException: The file is locked: C:/dev/fullstack/todo-manager/backend/data/tododb.mv.db [2.4.240/7]" [50000-240]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:566)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 37 more
+Caused by: org.h2.mvstore.MVStoreException: The file is locked: C:/dev/fullstack/todo-manager/backend/data/tododb.mv.db [2.4.240/7]
+	at org.h2.mvstore.DataUtils.newMVStoreException(DataUtils.java:996)
+	at org.h2.mvstore.SingleFileStore.lockFileChannel(SingleFileStore.java:143)
+	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:117)
+	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:81)
+	at org.h2.mvstore.MVStore.<init>(MVStore.java:291)
+	... 31 more
