@@ -100,16 +100,11 @@
 
  <div *ngFor="let task of editTasks" class="task editable-task" cdkDrag>
   <div
-  class="title editable-title"
-  contenteditable="true"
-  (input)="updateEditTaskTitle(task, $event)"
-  (blur)="saveEditTaskTitle(task)"
-  (keydown.enter)="finishEdit($event, task)"
-  (mousedown)="$event.stopPropagation()"
->
-  {{ task.title }}
-</div>
-
-  <div class="desc">{{ task.description }}</div>
+    class="title editable-title"
+    contenteditable="true"
+    (blur)="saveEditTaskTitle(task, $event)"
+    (keydown.enter)="finishEdit($event, task)"
+    (mousedown)="$event.stopPropagation()"
+  >{{ task.title }}</div>
 </div>
 </section>
