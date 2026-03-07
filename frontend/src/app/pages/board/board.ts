@@ -149,32 +149,39 @@ dropToEditArea(event: CdkDragDrop<Task[]>): void {
   );
 }
 
-updateEditTaskTitle(task: Task, event: Event): void {
+saveEditTaskTitle(task: Task, event: Event): void {
   const element = event.target as HTMLElement;
-  task.title = element.textContent?.trim() ?? '';
-}
-saveEditTaskTitle(task: Task): void {
+  const newTitle = (element.textContent ?? '').trim();
 
-  const trimmedTitle = task.title.trim();
-
-  if (!trimmedTitle) {
+  if (!newTitle) {
+    element.textContent = task.title;
     return;
   }
 
-  this.todoService.updateTitle(task.id, trimmedTitle)
-    .subscribe({
-      next: updatedTask => {
-        task.title = updatedTask.title;
-      },
-      error: () => {
-        this.reload();
-      }
-    });
+  if (newTitle === task.title) {
+    return;
+  }
+
+  this.todoService.updateTitle(task.id, newTitle).subscribe({
+    next: updatedTask => {
+      task.title = updatedTask.title;
+      element.textContent = updatedTask.title;
+    },
+    error: () => {
+      element.textContent = task.title;
+      this.reload();
+    }
+  });
+}
+
+
+startEditingTitle(event: Event): void {
+  event.stopPropagation();
 }
 
 finishEdit(event: Event, task: Task): void {
   event.preventDefault();
-  this.saveEditTaskTitle(task);
+  this.saveEditTaskTitle(task, event);
   (event.target as HTMLElement).blur();
 }
 

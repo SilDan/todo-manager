@@ -1,0 +1,35 @@
+.theme-toggle {
+  width: 120px;
+  min-height: 120px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: 0 4px 12px var(--shadow);
+
+  cursor: pointer;
+  user-select: none;
+  transition: transform 120ms ease, border-style 120ms ease, opacity 120ms ease;
+
+  color: var(--title);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.02);
+}
+
+.theme-toggle__icon {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.theme-toggle__label {
+  font-size: 12px;
+  opacity: 0.8;
+}
