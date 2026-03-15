@@ -9,6 +9,7 @@ import java.util.Comparator;
 public record TodoDto(
         String id,
         String title,
+        String description,
         String status,
         Instant activeSessionBeginTime,
         long totalProcessingTimeSeconds
@@ -28,6 +29,7 @@ public record TodoDto(
         return new TodoDto(
                 todo.getId(),
                 todo.getTitle(),
+                todo.getDescription(),
                 todo.getStatus(),
                 beginTime,
                 totalProcessingTimeSeconds
@@ -40,6 +42,7 @@ public record TodoDto(
         return new TodoDto(
                 todo.getId(),
                 todo.getTitle(),
+                todo.getDescription(),
                 todo.getStatus(),
                 beginTime,
                 totalProcessingTimeSeconds

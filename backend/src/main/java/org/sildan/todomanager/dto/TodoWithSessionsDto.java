@@ -7,6 +7,7 @@ import java.util.List;
 public record TodoWithSessionsDto(
         String id,
         String title,
+        String description,
         String status,
         List<TodoProcessingSessionDto> processingSessions
 ) {
@@ -17,6 +18,7 @@ public record TodoWithSessionsDto(
         return new TodoWithSessionsDto(
                 todo.getId(),
                 todo.getTitle(),
+                todo.getDescription(),
                 todo.getStatus(),
                 sessions
         );

@@ -1,6 +1,7 @@
 package org.sildan.todomanager.controller;
 
 import org.sildan.todomanager.dto.TodoDto;
+import org.sildan.todomanager.dto.UpdateDescriptionRequest;
 import org.sildan.todomanager.dto.UpdateStatusRequest;
 import org.sildan.todomanager.dto.UpdateTitleRequest;
 import org.sildan.todomanager.model.Todo;
@@ -31,7 +32,7 @@ public class TodoController {
 
     /**
      * Retrieves all todo items. This endpoint returns a list of all existing todo items in the system, each represented
-     * as a JSON object containing its ID, title, and status.
+     * as a JSON object containing its ID, title, description, and status.
      *
      * <p><strong>Example response:</strong></p>
      *
@@ -40,11 +41,13 @@ public class TodoController {
      *   {
      *     "id": "123e4567-e89b-12d3-a456-426614174000",
      *     "title": "Buy groceries",
+     *     "description": "Milk, bread and apples",
      *     "status": "TODO"
      *   },
      *   {
      *     "id": "123e4567-e89b-12d3-a456-426614174001",
      *     "title": "Finish project report",
+     *     "description": "Prepare final draft for Monday",
      *     "status": "IN_PROGRESS"
      *   }
      * ]
@@ -58,9 +61,10 @@ public class TodoController {
     }
 
     /**
-     * Create a new todo item. The request body should contain a JSON object with a "title" field. The server will
-     * generate a unique ID and set the initial status to "TODO". The created todo item will be returned in the
-     * response. Example request body: { "title": "Buy groceries" }
+     * Create a new todo item. The request body should contain a JSON object with a "title" field and may optionally
+     * contain a "description" field. The server will generate a unique ID and set the initial status to "TODO". The
+     * created todo item will be returned in the response. Example request body: { "title": "Buy groceries",
+     * "description": "Milk, bread and apples" }
      *
      * @param todo The todo item to create, containing at least a "title" field.
      * @return The created {@link TodoDto} item with a generated ID and initial status "TODO".
@@ -68,7 +72,7 @@ public class TodoController {
     @PostMapping
     public TodoDto create(@RequestBody Todo todo) {
         String id = UUID.randomUUID().toString();
-        Todo newTodo = new Todo(id, todo.getTitle(), INITIAL_STATE);
+        Todo newTodo = new Todo(id, todo.getTitle(), todo.getDescription(), INITIAL_STATE);
         return TodoDto.from(repo.save(newTodo));
     }
 
@@ -154,6 +158,22 @@ public class TodoController {
 
         Todo existing = repo.findById(id).orElseThrow();
         existing.setTitle(updateTitleRequest.title());
+        return TodoDto.from(repo.save(existing));
+    }
+
+    /**
+     * Update the description of a todo item.
+     *
+     * @param id                       The ID of the todo item to update.
+     * @param updateDescriptionRequest The request body containing the new description for the todo item.
+     * @return The updated {@link TodoDto} item with the new description.
+     */
+    @PatchMapping("/{id}/description")
+    public TodoDto updateDescription(@PathVariable String id,
+                                     @RequestBody UpdateDescriptionRequest updateDescriptionRequest) {
+
+        Todo existing = repo.findById(id).orElseThrow();
+        existing.setDescription(updateDescriptionRequest.description());
         return TodoDto.from(repo.save(existing));
     }
 
