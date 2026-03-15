@@ -125,6 +125,7 @@ public class TodoController {
 
         if (oldStatus.equals("IN_PROGRESS") && !newStatus.equals("IN_PROGRESS")) {
             stopProcessingSession(givenTodo);
+
         }
 
         givenTodo.setStatus(newStatus);
@@ -133,7 +134,7 @@ public class TodoController {
         Todo todoWithSessions = repo.findByIdWithProcessingSessions(id).orElseThrow();
 
         if (newStatus.equals("IN_PROGRESS") && !oldStatus.equals("IN_PROGRESS")) {
-            return TodoDto.from(givenTodo, activeSessionBeginTime);
+            return TodoDto.from(givenTodo, activeSessionBeginTime, 0);
         }
 
         return TodoDto.from(todoWithSessions);

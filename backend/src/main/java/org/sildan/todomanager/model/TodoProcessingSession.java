@@ -23,12 +23,11 @@ public class TodoProcessingSession {
     private Instant endTime;
 
     protected TodoProcessingSession() {
-
     }
 
     public TodoProcessingSession(Todo todo, Instant beginTime) {
-     this.todo=todo;
-     this.beginTime=beginTime;
+        this.todo = todo;
+        this.beginTime = beginTime;
     }
 
     public Long getId() {

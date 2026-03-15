@@ -60,9 +60,9 @@
 
     <div class="task" *ngFor="let task of inProgressTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
       <div class="title">{{ task.title }}</div>
-       <div *ngIf="task.activeSessionBeginTime" class="session-row">
-        <span class="session-label">Started at</span>
-        <span class="session-time">
+       <div *ngIf="task.activeSessionBeginTime" class="session-begin">
+        <span class="session-begin-label">Started at</span>
+        <span class="session-begin-time">
           {{ task.activeSessionBeginTime | date:'dd.MM.yyyy HH:mm' }}
         </span>
        </div>
@@ -83,6 +83,12 @@
 
     <div class="task" *ngFor="let task of doneTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
       <div class="title">{{ task.title }}</div>
+      <div *ngIf="task.totalProcessingTimeSeconds" class="session-duration">
+        <span class="session-duration-label">Total processing time</span>
+        <span class="session-duration-time">
+          {{ formatProcessingTime(task.totalProcessingTimeSeconds) }}  
+        </span>
+      </div>
       <div class="desc">{{ task.description }}</div>
     </div>
   </section>

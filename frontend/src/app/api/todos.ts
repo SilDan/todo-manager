@@ -10,6 +10,7 @@ export type Task = {
   description?: string;
   status: Status;
   activeSessionBeginTime: string | null;
+  totalProcessingTimeSeconds: number;
 }
 
 @Injectable({

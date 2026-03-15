@@ -239,7 +239,8 @@
   outline: 1px dashed var(--border);
   border-radius: 4px;
 }
-.session-row {
+
+.session-begin{
   display: flex;
   justify-content: space-between;
   margin-top: 0.25rem;
@@ -247,10 +248,27 @@
   opacity: 0.75;
 }
 
-.session-label {
+.session-begin-label{
   font-weight: 500;
 }
 
-.session-time {
+.session-begin-time{
+  font-family: monospace;
+}
+
+
+.session-duration{
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.session-duration-label{
+  font-weight: 500;
+}
+
+.session-duration-time{
   font-family: monospace;
 }

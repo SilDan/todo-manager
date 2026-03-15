@@ -10,7 +10,8 @@ public record TodoDto(
         String id,
         String title,
         String status,
-        Instant activeSessionBeginTime
+        Instant activeSessionBeginTime,
+        long totalProcessingTimeSeconds
 ) {
 
     public static TodoDto from(Todo todo) {
@@ -18,23 +19,30 @@ public record TodoDto(
                 session -> session.getEndTime() == null).max(
                 Comparator.comparing(
                         TodoProcessingSession::getBeginTime)).map(TodoProcessingSession::getBeginTime).orElse(null);
-
+        long totalProcessingTimeSeconds = todo.getProcessingSessions().stream()
+                .filter(session -> session.getEndTime() != null)
+                .mapToLong(session ->
+                        (session.getEndTime().toEpochMilli() - session.getBeginTime().toEpochMilli()) / 1000
+                )
+                .sum();
         return new TodoDto(
                 todo.getId(),
                 todo.getTitle(),
                 todo.getStatus(),
-                beginTime
+                beginTime,
+                totalProcessingTimeSeconds
         );
 
     }
 
-    public static TodoDto from(Todo todo, Instant beginTime) {
+    public static TodoDto from(Todo todo, Instant beginTime, long totalProcessingTimeSeconds) {
 
         return new TodoDto(
                 todo.getId(),
                 todo.getTitle(),
                 todo.getStatus(),
-                beginTime
+                beginTime,
+                totalProcessingTimeSeconds
         );
     }
 }
