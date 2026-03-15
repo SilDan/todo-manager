@@ -13,8 +13,8 @@ public class Todo {
     private String id;
 
     private String title;
-    private String status;
     private String description;
+    private String status;
 
     @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TodoProcessingSession> processingSessions = new ArrayList<>();
@@ -22,9 +22,10 @@ public class Todo {
     public Todo() {
     }
 
-    public Todo(String id, String title, String status) {
+    public Todo(String id, String title, String description, String status) {
         this.id = id;
         this.title = title;
+        this.description = description;
         this.status = status;
     }
 

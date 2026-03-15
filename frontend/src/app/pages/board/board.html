@@ -1,34 +1,38 @@
 <h1 class="title">Todo Board</h1>
 
 <div class="task-input">
-  <section
-    class="input-area"   > 
+  <section class="input-area">
     <input
-    type="text"
-    [(ngModel)]="newTitle"
-    placeholder="What needs to be done?"
-    (keyup.enter)="add()"
+      type="text"
+      [(ngModel)]="newTitle"
+      placeholder="What needs to be done?"
+      (keyup.enter)="add()"
     />
-    
+
+    <textarea
+      [(ngModel)]="newDescription"
+      placeholder="Add a description (optional)"
+      rows="3"
+    ></textarea>
+
     <button (click)="add()">Add</button>
   </section>
 </div>
 
-  <!-- TRASH -->
- <div class="trash-placeholder" >
-  <!-- Drag tasks here to delete them. -->
+<div class="trash-placeholder">
   <aside
-  class="trash"
-  cdkDropList
-  #trashList="cdkDropList"
-  [cdkDropListData]="trashData"
-  [cdkDropListEnterPredicate]="canDropToTrash"
-   (cdkDropListDropped)="trashDropped($event)"
-   >
-   <div class="trash__icon">🗑️</div>
-   <div class="trash__label">Trash</div>
- </aside>
- </div>
+    class="trash"
+    cdkDropList
+    #trashList="cdkDropList"
+    [cdkDropListData]="trashData"
+    [cdkDropListEnterPredicate]="canDropToTrash"
+    (cdkDropListDropped)="trashDropped($event)"
+  >
+    <div class="trash__icon">🗑️</div>
+    <div class="trash__label">Trash</div>
+  </aside>
+</div>
+
 <div class="columns">
   <!-- TODO -->
   <section
@@ -43,7 +47,7 @@
 
     <div class="task" *ngFor="let task of todoTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
       <div class="title">{{ task.title }}</div>
-      <div class="desc">{{ task.description }}</div>
+      <div *ngIf="task.description" class="desc">{{ task.description }}</div>
     </div>
   </section>
 
@@ -60,13 +64,13 @@
 
     <div class="task" *ngFor="let task of inProgressTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
       <div class="title">{{ task.title }}</div>
-       <div *ngIf="task.activeSessionBeginTime" class="session-begin">
+      <div *ngIf="task.activeSessionBeginTime" class="session-begin">
         <span class="session-begin-label">Started at</span>
         <span class="session-begin-time">
           {{ task.activeSessionBeginTime | date:'dd.MM.yyyy HH:mm' }}
         </span>
-       </div>
-      <div class="desc">{{ task.description }}</div>
+      </div>
+      <div *ngIf="task.description" class="desc">{{ task.description }}</div>
     </div>
   </section>
 
@@ -86,17 +90,15 @@
       <div *ngIf="task.totalProcessingTimeSeconds" class="session-duration">
         <span class="session-duration-label">Total processing time</span>
         <span class="session-duration-time">
-          {{ formatProcessingTime(task.totalProcessingTimeSeconds) }}  
+          {{ formatProcessingTime(task.totalProcessingTimeSeconds) }}
         </span>
       </div>
-      <div class="desc">{{ task.description }}</div>
+      <div *ngIf="task.description" class="desc">{{ task.description }}</div>
     </div>
   </section>
-
-  
 </div>
 
-<section 
+<section
   class="edit-area"
   cdkDropList
   id="editArea"
@@ -104,19 +106,28 @@
   [cdkDropListData]="editTasks"
   [cdkDropListConnectedTo]="[todoList, inProgressList, doneList, trashList]"
   (cdkDropListDropped)="dropToEditArea($event)"
-  >
-    <h3>Edit Area</h3>
-    <div *ngIf="editTasks.length === 0" class="edit-placeholder">
+>
+  <h3>Edit Area</h3>
+  <div *ngIf="editTasks.length === 0" class="edit-placeholder">
     Drag a task here.
   </div>
 
- <div *ngFor="let task of editTasks" class="task editable-task" cdkDrag>
-  <div
-    class="title editable-title"
-    contenteditable="true"
-    (blur)="saveEditTaskTitle(task, $event)"
-    (keydown.enter)="finishEdit($event, task)"
-    (mousedown)="$event.stopPropagation()"
-  >{{ task.title }}</div>
-</div>
+  <div *ngFor="let task of editTasks" class="task editable-task" cdkDrag>
+    <div
+      class="title editable-title"
+      contenteditable="true"
+      (blur)="saveEditTaskTitle(task, $event)"
+      (keydown.enter)="finishEdit($event, task)"
+      (mousedown)="$event.stopPropagation()"
+    >{{ task.title }}</div>
+
+    <div
+      class="desc editable-description"
+      contenteditable="true"
+      data-placeholder="Add a description"
+      (blur)="saveEditTaskDescription(task, $event)"
+      (keydown.enter)="finishDescriptionEdit($event, task)"
+      (mousedown)="$event.stopPropagation()"
+    >{{ task.description }}</div>
+  </div>
 </section>

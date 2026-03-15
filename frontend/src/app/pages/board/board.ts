@@ -1,13 +1,13 @@
-import {ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { 
-  DragDropModule, 
+import {
+  DragDropModule,
   CdkDrag,
-  CdkDragDrop, 
-  moveItemInArray, 
-  transferArrayItem, 
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
 } from '@angular/cdk/drag-drop';
 
 import { TodoService, Task, Status } from '../../api/todos';
@@ -22,6 +22,7 @@ import { TodoService, Task, Status } from '../../api/todos';
 export class Board implements OnInit {
 
   newTitle = '';
+  newDescription = '';
 
   /** Flat list from backend (optional but useful for debugging / future features). */
   tasks: Task[] = [];
@@ -31,7 +32,7 @@ export class Board implements OnInit {
   inProgressTasks: Task[] = [];
   doneTasks: Task[] = [];
   editTasks: Task[] = [];
-  trashData: Task[] = []; 
+  trashData: Task[] = [];
 
   constructor(private readonly todoService: TodoService, private readonly cdr: ChangeDetectorRef) {}
 
@@ -41,27 +42,29 @@ export class Board implements OnInit {
 
   private reload(): void {
     this.todoService.getTodos().subscribe(todos => {
-      // Backend liefert kein description -> default setzen
-      const mapped = todos.map(t => ({ ...t, description: (t as any).description ?? '' }));
+      const mapped = todos.map(t => ({ ...t, description: t.description ?? '' }));
 
       this.tasks = mapped;
-
-      // build stable lists for DnD
       this.todoTasks = mapped.filter(t => t.status === 'TODO');
       this.inProgressTasks = mapped.filter(t => t.status === 'IN_PROGRESS');
       this.doneTasks = mapped.filter(t => t.status === 'DONE');
       this.trashData = [];
       this.editTasks = [];
-      this.cdr.detectChanges(); // Force update to avoid ExpressionChangedAfterItHasBeenCheckedError after async update
+      this.cdr.detectChanges();
     });
   }
 
   add(): void {
     const title = this.newTitle.trim();
-    if (!title) return;
+    const description = this.newDescription.trim();
 
-    this.todoService.createTodo(title).subscribe(() => this.reload());
+    if (!title) {
+      return;
+    }
+
+    this.todoService.createTodo(title, description).subscribe(() => this.reload());
     this.newTitle = '';
+    this.newDescription = '';
   }
 
   move(id: string, status: Status): void {
@@ -93,8 +96,6 @@ export class Board implements OnInit {
     );
 
     const movedTask = event.container.data[event.currentIndex];
-
-    // IMPORTANT: status must become the target column's status
     this.move(movedTask.id, targetStatus);
   }
 
@@ -102,123 +103,150 @@ export class Board implements OnInit {
     return t.id;
   }
 
-  // Only allow drops if there is actual drag data
-canDropToTrash = (drag: CdkDrag<Task>, _drop: any) => {
-  return !!drag.data?.id;
-};
+  canDropToTrash = (drag: CdkDrag<Task>, _drop: unknown): boolean => {
+    return !!drag.data?.id;
+  };
 
-trashDropped(event: CdkDragDrop<Task[]>): void {
-  const task = event.item.data as Task | undefined;
-  if (!task?.id) return;
+  trashDropped(event: CdkDragDrop<Task[]>): void {
+    const task = event.item.data as Task | undefined;
+    if (!task?.id) {
+      return;
+    }
 
-  const ok = confirm(`"${task.title}" really delete?`);
-  if (!ok) {
-    this.reload();
-    return;
-  }
-
-  this.removeFromColumns(task.id);
-
-  this.todoService.deleteTodo(task.id).subscribe({
-    next: () => this.reload(),
-    error: (err) => {
-      console.error('Delete failed', err);
+    const ok = confirm(`"${task.title}" really delete?`);
+    if (!ok) {
       this.reload();
-      alert('Delete failed - item was restored to board');
-    },
-  });
-}
+      return;
+    }
 
-private removeFromColumns(id: string): void {
-  this.todoTasks = this.todoTasks.filter(t => t.id !== id);
-  this.inProgressTasks = this.inProgressTasks.filter(t => t.id !== id);
-  this.doneTasks = this.doneTasks.filter(t => t.id !== id);
-}
+    this.removeFromColumns(task.id);
 
-dropToEditArea(event: CdkDragDrop<Task[]>): void {
-  if (event.previousContainer === event.container) {
-    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    return;
+    this.todoService.deleteTodo(task.id).subscribe({
+      next: () => this.reload(),
+      error: (err) => {
+        console.error('Delete failed', err);
+        this.reload();
+        alert('Delete failed - item was restored to board');
+      },
+    });
   }
 
-  transferArrayItem(
-    event.previousContainer.data,
-    event.container.data,
-    event.previousIndex,
-    event.currentIndex
-  );
-}
-
-saveEditTaskTitle(task: Task, event: Event): void {
-  const element = event.target as HTMLElement;
-  const newTitle = (element.textContent ?? '').trim();
-
-  if (!newTitle) {
-    element.textContent = task.title;
-    return;
+  private removeFromColumns(id: string): void {
+    this.todoTasks = this.todoTasks.filter(t => t.id !== id);
+    this.inProgressTasks = this.inProgressTasks.filter(t => t.id !== id);
+    this.doneTasks = this.doneTasks.filter(t => t.id !== id);
   }
 
-  if (newTitle === task.title) {
-    return;
+  dropToEditArea(event: CdkDragDrop<Task[]>): void {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      return;
+    }
+
+    transferArrayItem(
+      event.previousContainer.data,
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex
+    );
   }
 
-  this.todoService.updateTitle(task.id, newTitle).subscribe({
-    next: updatedTask => {
-      task.title = updatedTask.title;
-      element.textContent = updatedTask.title;
-    },
-    error: () => {
+  saveEditTaskTitle(task: Task, event: Event): void {
+    const element = event.target as HTMLElement;
+    const newTitle = (element.textContent ?? '').trim();
+
+    if (!newTitle) {
       element.textContent = task.title;
-      this.reload();
+      return;
     }
-  });
-}
 
+    if (newTitle === task.title) {
+      return;
+    }
 
-startEditingTitle(event: Event): void {
-  event.stopPropagation();
-}
-
-finishEdit(event: Event, task: Task): void {
-  event.preventDefault();
-  this.saveEditTaskTitle(task, event);
-  (event.target as HTMLElement).blur();
-}
-
-formatProcessingTime(totalSeconds: number): string {
-
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    this.todoService.updateTitle(task.id, newTitle).subscribe({
+      next: updatedTask => {
+        this.updateTaskInAllLists(updatedTask);
+        element.textContent = updatedTask.title;
+      },
+      error: () => {
+        element.textContent = task.title;
+        this.reload();
+      }
+    });
   }
 
-  if (minutes > 0) {
-    return `${minutes}m ${seconds}s`;
+  saveEditTaskDescription(task: Task, event: Event): void {
+    const element = event.target as HTMLElement;
+    const newDescription = (element.textContent ?? '').trim();
+    const currentDescription = task.description ?? '';
+
+    if (newDescription === currentDescription) {
+      element.textContent = currentDescription;
+      return;
+    }
+
+    this.todoService.updateDescription(task.id, newDescription).subscribe({
+      next: updatedTask => {
+        this.updateTaskInAllLists(updatedTask);
+        element.textContent = updatedTask.description ?? '';
+      },
+      error: () => {
+        element.textContent = currentDescription;
+        this.reload();
+      }
+    });
   }
 
-  return `${seconds}s`;
-}
+  startEditingTitle(event: Event): void {
+    event.stopPropagation();
+  }
 
-private updateTaskInAllLists(updatedTask: Task): void {
-  const allLists = [
-    this.todoTasks,
-    this.inProgressTasks,
-    this.doneTasks,
-    this.editTasks
-  ];
+  finishEdit(event: Event, task: Task): void {
+    event.preventDefault();
+    this.saveEditTaskTitle(task, event);
+    (event.target as HTMLElement).blur();
+  }
 
-  for (const list of allLists) {
-    const existingTask = list.find(task => task.id === updatedTask.id);
-    if (existingTask) {
-      existingTask.title = updatedTask.title;
-      existingTask.description = updatedTask.description;
-      existingTask.status = updatedTask.status;
+  finishDescriptionEdit(event: Event, task: Task): void {
+    event.preventDefault();
+    this.saveEditTaskDescription(task, event);
+    (event.target as HTMLElement).blur();
+  }
+
+  formatProcessingTime(totalSeconds: number): string {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+
+    if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    }
+
+    return `${seconds}s`;
+  }
+
+  private updateTaskInAllLists(updatedTask: Task): void {
+    const allLists = [
+      this.todoTasks,
+      this.inProgressTasks,
+      this.doneTasks,
+      this.editTasks
+    ];
+
+    for (const list of allLists) {
+      const existingTask = list.find(task => task.id === updatedTask.id);
+      if (existingTask) {
+        existingTask.title = updatedTask.title;
+        existingTask.description = updatedTask.description ?? '';
+        existingTask.status = updatedTask.status;
+        existingTask.activeSessionBeginTime = updatedTask.activeSessionBeginTime;
+        existingTask.totalProcessingTimeSeconds = updatedTask.totalProcessingTimeSeconds;
+      }
     }
   }
 }
-
-}
-

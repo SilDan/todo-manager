@@ -27,18 +27,23 @@ export class TodoService  {
     return this.http.get<Task[]>(this.baseUrl);
   }
   
-  createTodo(title: string): Observable<Task> {
-    return this.http.post<Task>(this.baseUrl, { title });
-  }   
+  createTodo(title: string, description: string): Observable<Task> {
+    return this.http.post<Task>(this.baseUrl, { title, description });
+  }
+
   updateTodo(id: string, status: Status): Observable<Task> {
     return this.http.patch<Task>(`${this.baseUrl}/${id}`, { status });
-  } 
+  }
 
-  updateTitle(id: string, title: string) {
-  return this.http.patch<Task>(`${this.baseUrl}/${id}/title`, { title });
- }
+  updateTitle(id: string, title: string): Observable<Task> {
+    return this.http.patch<Task>(`${this.baseUrl}/${id}/title`, { title });
+  }
 
-  deleteTodo(id: string) {
+  updateDescription(id: string, description: string): Observable<Task> {
+    return this.http.patch<Task>(`${this.baseUrl}/${id}/description`, { description });
+  }
+
+  deleteTodo(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 

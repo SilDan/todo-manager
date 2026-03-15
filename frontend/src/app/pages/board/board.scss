@@ -272,3 +272,40 @@
 .session-duration-time{
   font-family: monospace;
 }
+
+.input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 320px;
+}
+
+.task-input textarea {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  padding: 8px 12px;
+  border-radius: 6px;
+  resize: vertical;
+  min-height: 80px;
+  font: inherit;
+}
+
+.desc {
+  margin-top: 8px;
+  white-space: pre-wrap;
+  color: var(--title);
+  opacity: 0.85;
+}
+
+.editable-description {
+  outline: none;
+  cursor: text;
+  min-height: 3.2em;
+  width: 100%;
+}
+
+.editable-description:empty::before {
+  content: attr(data-placeholder);
+  color: #888;
+}
