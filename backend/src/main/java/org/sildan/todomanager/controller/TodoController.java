@@ -182,8 +182,10 @@ public class TodoController {
     private void stopProcessingSession(Todo todo) {
         TodoProcessingSession session = sessionRepo.findFirstByTodoAndEndTimeIsNullOrderByBeginTimeDesc(
                 todo).orElseThrow(
-                () -> new IllegalStateException("No open processing session found for todo " + todo.getId()));
-
+                () -> new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "No open processing session found for todo " + todo.getId()
+                ));
         session.setEndTime(Instant.now());
         sessionRepo.save(session);
     }

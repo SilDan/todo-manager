@@ -239,4 +239,18 @@
   outline: 1px dashed var(--border);
   border-radius: 4px;
 }
+.session-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
 
+.session-label {
+  font-weight: 500;
+}
+
+.session-time {
+  font-family: monospace;
+}
