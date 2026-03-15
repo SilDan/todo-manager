@@ -1,8 +1,9 @@
 package org.sildan.todomanager.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="todos")
@@ -10,9 +11,12 @@ public class Todo {
 
     @Id
     private String id;
+
     private String title;
     private String status;
 
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TodoProcessingSession> processingSessions = new ArrayList<>();
 
     public Todo() {
     }
@@ -31,4 +35,12 @@ public class Todo {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public List<TodoProcessingSession> getProcessingSessions() {
+        return processingSessions;
+    }
+
+    public void setProcessingSessions(List<TodoProcessingSession> processingSessions) {
+        this.processingSessions = processingSessions;
+    }
 }
