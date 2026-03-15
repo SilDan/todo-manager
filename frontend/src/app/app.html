@@ -1,5 +1,11 @@
-<button (click)="toggleDarkMode()">
-  {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
-</button>
+<div class="theme-toggle" (click)="toggleDarkMode()">
+  <div class="theme-toggle__icon">
+    💡
+  </div>
+  <div class="theme-toggle__label">
+    {{ isDarkMode ? 'Light' : 'Dark' }}
+  </div>
+</div>
+
 
 <router-outlet></router-outlet>
