@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export type Status = 'TODO' | 'IN_PROGRESS' | 'DONE';
 
@@ -19,7 +20,7 @@ export type Task = {
 
 export class TodoService  {
 
-  private readonly baseUrl = '/api/todos';
+  private readonly baseUrl = `${environment.apiUrl}/todos`;
 
   constructor(private readonly http: HttpClient) {}
   
