@@ -229,6 +229,12 @@
   transform: scale(1.1);
 }
 
+.task-title {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--title);
+}
+
 .editable-title {
   outline: none;
   cursor: text;
@@ -241,6 +247,7 @@
 }
 
 .session-begin{
+  margin-top: 0.45rem;
   display: flex;
   justify-content: space-between;
   margin-top: 0.25rem;
@@ -258,6 +265,7 @@
 
 
 .session-duration{
+  margin-top: 0.45rem;
   display: flex;
   justify-content: space-between;
   margin-top: 0.25rem;
@@ -292,10 +300,12 @@
 }
 
 .desc {
-  margin-top: 8px;
+  margin-top: 0.35rem;
   white-space: pre-wrap;
-  color: var(--title);
-  opacity: 0.85;
+  color: var(--desc-color);
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.35;
 }
 
 .editable-description {
