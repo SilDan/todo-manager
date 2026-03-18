@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeService } from './core/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -7,13 +8,20 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
+export class App implements OnInit {
 
-export class App {
-  isDarkMode = false;
+  constructor(private readonly themeService: ThemeService) {}
 
-  toggleDarkMode():void {
-    this.isDarkMode = !this.isDarkMode;
-    document.body.classList.toggle('dark-mode', this.isDarkMode);
+  ngOnInit(): void {
+    this.themeService.initializeTheme();
+  }
+
+  toggleDarkMode(): void {
+    this.themeService.toggleTheme();
+  }
+
+  isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
   }
 
   protected readonly title = signal('frontend');
