@@ -4,10 +4,7 @@ import org.sildan.todomanager.dto.ThemeSettingsDto;
 import org.sildan.todomanager.dto.UpdateThemeSettingsRequest;
 import org.sildan.todomanager.repository.AppSettingRepository;
 import org.sildan.todomanager.settings.AppSetting;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/settings")
@@ -39,6 +36,14 @@ public class SettingsController {
         setting.setValue(normalized);
 
         repository.save(setting);
+
+        return new ThemeSettingsDto(setting.getValue());
+    }
+
+    @GetMapping("/theme")
+    public ThemeSettingsDto getTheme() {
+        AppSetting setting = repository.findById(THEME_KEY)
+                .orElseGet(() -> repository.save(new AppSetting(THEME_KEY, "LIGHT")));
 
         return new ThemeSettingsDto(setting.getValue());
     }
