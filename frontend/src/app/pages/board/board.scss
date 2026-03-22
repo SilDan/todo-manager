@@ -1,19 +1,21 @@
-.columns {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-
-  max-width: 1100px;   /* maximale Boardbreite */
-  margin: 0 auto;      /* zentriert das Board */
-  padding: 0 20px;     /* Abstand zu den Rändern */
+.board__title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--title);
 }
-/* Input-Bar oben */
-.task-input {
+
+.board__input {
   display: flex;
   justify-content: center;
-  gap: 10px;
-
   margin: 0 auto 26px;
+}
+
+.board__input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 320px;
+
   padding: 14px 16px;
   width: fit-content;
 
@@ -23,15 +25,22 @@
   box-shadow: 0 4px 12px var(--shadow);
 }
 
-.task-input input {
+.board__input-panel input,
+.board__input-panel textarea {
   background-color: var(--input-bg);
   color: var(--input-text);
   border: 1px solid var(--input-border);
   padding: 8px 12px;
   border-radius: 6px;
+  font: inherit;
 }
 
-.task-input button {
+.board__input-panel textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.board__input-panel button {
   background-color: var(--input-button-bg);
   color: var(--input-bg);
   border: none;
@@ -40,83 +49,22 @@
   cursor: pointer;
 }
 
-.task-input button:hover {
+.board__input-panel button:hover {
   opacity: 0.85;
 }
 
-.title {
-  text-align: center;
-  margin-bottom: 20px;
-  color: var(--title);
-}
+.board__trash-area {
+  position: absolute;
+  top: 20px;
+  right: 20px;
 
-/* Columns (Drop zones) */
-.column {
-  flex: 1;
-  padding: 16px;
-  border-radius: 12px;
-  min-height: 300px;
-  border: 1px solid var(--border);
-
-  /* makes the drop area feel stable */
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  gap: 6px;
 }
 
-.column.todo {
-  background-color: var(--col-todo);
-}
-.column.in-progress {
-  background-color: var(--col-inprogress);
-}
-.column.done {
-  background-color: var(--col-done);
-}
-
-/* Task cards (draggable items) */
-.task {
-  background: var(--card);
-  border: 1px solid var(--border); /* (bei dir war versehentlich padding statt border) */
-  border-radius: 8px;
-  margin-bottom: 0; /* spacing kommt über gap der column */
-  box-shadow: 0 2px 4px var(--shadow);
-
-  padding: 10px 12px;
-  cursor: grab;
-  user-select: none;
-}
-
-.task:active {
-  cursor: grabbing;
-}
-
-/* --- Angular CDK Drag & Drop visuals --- */
-
-/* preview (the element that follows the cursor) */
-.cdk-drag-preview {
-  box-shadow: 0 10px 24px var(--shadow);
-  border-radius: 10px;
-}
-
-/* placeholder (space left behind) */
-.cdk-drag-placeholder {
-  opacity: 0.35;
-}
-
-/* smooth movement when reordering */
-.cdk-drop-list-dragging .task:not(.cdk-drag-placeholder) {
-  transition: transform 200ms ease;
-}
-
-/* Optional: highlight drop list while dragging */
-.cdk-drop-list-dragging.column {
-  outline: 2px dashed var(--border);
-  outline-offset: 6px;
-}
-
-/* --- Trash drop zone --- */
-.trash {
+.trash-bin {
   width: 140px;
   min-height: 140px;
 
@@ -128,43 +76,145 @@
 
   border: 2px dashed var(--border);
   border-radius: 14px;
-
   background: var(--card);
   box-shadow: 0 4px 12px var(--shadow);
 
   user-select: none;
+  transition: transform 120ms ease, border-style 120ms ease, opacity 120ms ease;
 }
 
-.trash__icon {
+.trash-bin__icon {
   font-size: 40px;
   line-height: 1;
 }
 
-.trash__label {
+.trash-bin__label {
   font-size: 12px;
   color: var(--title);
   opacity: 0.8;
 }
 
-/* While dragging any task: make it look "active" */
-.cdk-drop-list-dragging .trash {
+.cdk-drop-list-dragging .trash-bin {
   outline: 2px dashed var(--border);
   outline-offset: 6px;
 }
 
-/* When a draggable is hovering over the trash drop list */
-.trash.cdk-drop-list-dragging.cdk-drop-list-receiving,
-.trash.cdk-drop-list-receiving {
+.trash-bin.cdk-drop-list-dragging.cdk-drop-list-receiving,
+.trash-bin.cdk-drop-list-receiving {
   border-style: solid;
   transform: scale(1.02);
 }
 
-/* Optional: nice animation */
-.trash {
-  transition: transform 120ms ease, border-style 120ms ease, opacity 120ms ease;
+.cdk-drop-list-receiving.trash-bin {
+  transform: scale(1.1);
 }
 
-.edit-area {
+.board__columns {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.board-column {
+  flex: 1;
+  min-height: 300px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.board-column--todo {
+  background-color: var(--col-todo);
+}
+
+.board-column--in-progress {
+  background-color: var(--col-inprogress);
+}
+
+.board-column--done {
+  background-color: var(--col-done);
+}
+
+.board-column__title {
+  margin: 0 0 8px;
+  text-align: center;
+  color: var(--title);
+}
+
+.task-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow);
+
+  padding: 10px 12px;
+  cursor: grab;
+  user-select: none;
+}
+
+.task-card:active {
+  cursor: grabbing;
+}
+
+.task-card__title {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--title);
+}
+
+.task-card__description {
+  margin-top: 0.35rem;
+  white-space: pre-wrap;
+  color: var(--desc-color);
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.task-card__meta {
+  margin-top: 0.45rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.task-card__meta-label {
+  font-weight: 500;
+}
+
+.task-card__meta-value {
+  font-family: monospace;
+}
+
+.cdk-drag-preview {
+  box-shadow: 0 10px 24px var(--shadow);
+  border-radius: 10px;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+
+.cdk-drop-list-dragging .task-card:not(.cdk-drag-placeholder) {
+  transition: transform 200ms ease;
+}
+
+.cdk-drop-list-dragging.board-column {
+  outline: 2px dashed var(--border);
+  outline-offset: 6px;
+}
+
+.edit-panel {
   margin: 40px auto;
   padding: 20px;
   width: 60%;
@@ -180,142 +230,46 @@
   gap: 10px;
 }
 
-.edit-area .task {
-  width: 280px;        /* oder 300px */
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.edit-area:hover {
+.edit-panel:hover {
   border-color: #555;
   background: var(--edit-area-bg);
 }
 
-.edit-placeholder {
-  color: #888;
-  font-style: italic;
-}
-.top-bar {
-  position: relative;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.task-input {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  position: relative;
-}
-
-.trash-placeholder {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.trash {
-  width: 120px;
-  min-height: 120px;
-}
-
-.cdk-drop-list-receiving.trash {
-  transform: scale(1.1);
-}
-
-.task-title {
-  font-weight: 700;
-  font-size: 0.98rem;
+.edit-panel__title {
+  margin: 0;
   color: var(--title);
 }
 
-.editable-title {
+.edit-panel__placeholder {
+  color: #888;
+  font-style: italic;
+}
+
+.task-card--editable {
+  width: 280px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.task-card__title--editable {
   outline: none;
   cursor: text;
   min-height: 1.2em;
 }
 
-.editable-title:focus {
+.task-card__title--editable:focus {
   outline: 1px dashed var(--border);
   border-radius: 4px;
 }
 
-.session-begin{
-  margin-top: 0.45rem;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.25rem;
-  font-size: 0.8rem;
-  opacity: 0.75;
-}
-
-.session-begin-label{
-  font-weight: 500;
-}
-
-.session-begin-time{
-  font-family: monospace;
-}
-
-
-.session-duration{
-  margin-top: 0.45rem;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.25rem;
-  font-size: 0.8rem;
-  opacity: 0.75;
-}
-
-.session-duration-label{
-  font-weight: 500;
-}
-
-.session-duration-time{
-  font-family: monospace;
-}
-
-.input-area {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 320px;
-}
-
-.task-input textarea {
-  background-color: var(--input-bg);
-  color: var(--input-text);
-  border: 1px solid var(--input-border);
-  padding: 8px 12px;
-  border-radius: 6px;
-  resize: vertical;
-  min-height: 80px;
-  font: inherit;
-}
-
-.desc {
-  margin-top: 0.35rem;
-  white-space: pre-wrap;
-  color: var(--desc-color);
-  font-style: italic;
-  font-size: 0.9rem;
-  line-height: 1.35;
-}
-
-.editable-description {
+.task-card__description--editable {
   outline: none;
   cursor: text;
   min-height: 3.2em;
   width: 100%;
 }
 
-.editable-description:empty::before {
+.task-card__description--editable:empty::before {
   content: attr(data-placeholder);
   color: #888;
 }

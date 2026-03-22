@@ -1,7 +1,7 @@
-<h1 class="title">Todo Board</h1>
+<h1 class="board__title">Todo Board</h1>
 
-<div class="task-input">
-  <section class="input-area">
+<div class="board__input">
+  <section class="board__input-panel">
     <input
       type="text"
       [(ngModel)]="newTitle"
@@ -19,87 +19,113 @@
   </section>
 </div>
 
-<div class="trash-placeholder">
+<div class="board__trash-area">
   <aside
-    class="trash"
+    class="trash-bin"
     cdkDropList
     #trashList="cdkDropList"
     [cdkDropListData]="trashData"
     [cdkDropListEnterPredicate]="canDropToTrash"
     (cdkDropListDropped)="trashDropped($event)"
   >
-    <div class="trash__icon">🗑️</div>
-    <div class="trash__label">Trash</div>
+    <div class="trash-bin__icon">🗑️</div>
+    <div class="trash-bin__label">Trash</div>
   </aside>
 </div>
 
-<div class="columns">
+<div class="board__columns">
   <!-- TODO -->
   <section
-    class="column todo"
+    class="board-column board-column--todo"
     cdkDropList
     #todoList="cdkDropList"
     [cdkDropListData]="todoTasks"
     [cdkDropListConnectedTo]="[inProgressList, doneList, trashList, editList]"
     (cdkDropListDropped)="drop($event, 'TODO')"
   >
-    <h3>TODO</h3>
+    <h3 class="board-column__title">TODO</h3>
 
-    <div class="task" *ngFor="let task of todoTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
-      <div class="title">{{ task.title }}</div>
-      <div *ngIf="task.description" class="desc">{{ task.description }}</div>
+    <div
+      class="task-card"
+      *ngFor="let task of todoTasks; trackBy: trackById"
+      cdkDrag
+      [cdkDragData]="task"
+    >
+      <div class="task-card__title">{{ task.title }}</div>
+
+      <div *ngIf="task.description" class="task-card__description">
+        {{ task.description }}
+      </div>
     </div>
   </section>
 
   <!-- IN_PROGRESS -->
   <section
-    class="column in-progress"
+    class="board-column board-column--in-progress"
     cdkDropList
     #inProgressList="cdkDropList"
     [cdkDropListData]="inProgressTasks"
     [cdkDropListConnectedTo]="[todoList, doneList, trashList, editList]"
     (cdkDropListDropped)="drop($event, 'IN_PROGRESS')"
   >
-    <h3>IN PROGRESS</h3>
+    <h3 class="board-column__title">IN PROGRESS</h3>
 
-    <div class="task" *ngFor="let task of inProgressTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
-      <div class="title">{{ task.title }}</div>
-      <div *ngIf="task.activeSessionBeginTime" class="session-begin">
-        <span class="session-begin-label">Started at</span>
-        <span class="session-begin-time">
+    <div
+      class="task-card"
+      *ngFor="let task of inProgressTasks; trackBy: trackById"
+      cdkDrag
+      [cdkDragData]="task"
+    >
+      <div class="task-card__title">{{ task.title }}</div>
+
+      <div *ngIf="task.description" class="task-card__description">
+        {{ task.description }}
+      </div>
+
+      <div *ngIf="task.activeSessionBeginTime" class="task-card__meta">
+        <span class="task-card__meta-label">Started at</span>
+        <span class="task-card__meta-value">
           {{ task.activeSessionBeginTime | date:'dd.MM.yyyy HH:mm' }}
         </span>
       </div>
-      <div *ngIf="task.description" class="desc">{{ task.description }}</div>
     </div>
   </section>
 
   <!-- DONE -->
   <section
-    class="column done"
+    class="board-column board-column--done"
     cdkDropList
     #doneList="cdkDropList"
     [cdkDropListData]="doneTasks"
     [cdkDropListConnectedTo]="[todoList, inProgressList, trashList, editList]"
     (cdkDropListDropped)="drop($event, 'DONE')"
   >
-    <h3>DONE</h3>
+    <h3 class="board-column__title">DONE</h3>
 
-    <div class="task" *ngFor="let task of doneTasks; trackBy: trackById" cdkDrag [cdkDragData]="task">
-      <div class="title">{{ task.title }}</div>
-      <div *ngIf="task.totalProcessingTimeSeconds" class="session-duration">
-        <span class="session-duration-label">Total processing time</span>
-        <span class="session-duration-time">
+    <div
+      class="task-card"
+      *ngFor="let task of doneTasks; trackBy: trackById"
+      cdkDrag
+      [cdkDragData]="task"
+    >
+      <div class="task-card__title">{{ task.title }}</div>
+
+      <div *ngIf="task.description" class="task-card__description">
+        {{ task.description }}
+      </div>
+
+      <div *ngIf="task.totalProcessingTimeSeconds" class="task-card__meta">
+        <span class="task-card__meta-label">Total processing time</span>
+        <span class="task-card__meta-value">
           {{ formatProcessingTime(task.totalProcessingTimeSeconds) }}
         </span>
       </div>
-      <div *ngIf="task.description" class="desc">{{ task.description }}</div>
     </div>
   </section>
 </div>
 
 <section
-  class="edit-area"
+  class="edit-panel"
   cdkDropList
   id="editArea"
   #editList="cdkDropList"
@@ -107,14 +133,15 @@
   [cdkDropListConnectedTo]="[todoList, inProgressList, doneList, trashList]"
   (cdkDropListDropped)="dropToEditArea($event)"
 >
-  <h3>Edit Area</h3>
-  <div *ngIf="editTasks.length === 0" class="edit-placeholder">
+  <h3 class="edit-panel__title">Edit Area</h3>
+
+  <div *ngIf="editTasks.length === 0" class="edit-panel__placeholder">
     Drag a task here.
   </div>
 
-  <div *ngFor="let task of editTasks" class="task editable-task" cdkDrag>
+  <div *ngFor="let task of editTasks" class="task-card task-card--editable" cdkDrag>
     <div
-      class="title editable-title"
+      class="task-card__title task-card__title--editable"
       contenteditable="true"
       (blur)="saveEditTaskTitle(task, $event)"
       (keydown.enter)="finishEdit($event, task)"
@@ -122,7 +149,7 @@
     >{{ task.title }}</div>
 
     <div
-      class="desc editable-description"
+      class="task-card__description task-card__description--editable"
       contenteditable="true"
       data-placeholder="Add a description"
       (blur)="saveEditTaskDescription(task, $event)"
