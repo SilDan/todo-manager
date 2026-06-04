@@ -30,6 +30,7 @@ export class Board implements OnInit {
   todoTasks: Task[] = [];
   inProgressTasks: Task[] = [];
   doneTasks: Task[] = [];
+  editTasks: Task[] = [];
   trashData: Task[] = []; 
 
   constructor(private readonly todoService: TodoService, private readonly cdr: ChangeDetectorRef) {}
@@ -49,7 +50,8 @@ export class Board implements OnInit {
       this.todoTasks = mapped.filter(t => t.status === 'TODO');
       this.inProgressTasks = mapped.filter(t => t.status === 'IN_PROGRESS');
       this.doneTasks = mapped.filter(t => t.status === 'DONE');
-
+      this.trashData = [];
+      this.editTasks = [];
       this.cdr.detectChanges(); // Force update to avoid ExpressionChangedAfterItHasBeenCheckedError after async update
     });
   }
@@ -132,5 +134,67 @@ private removeFromColumns(id: string): void {
   this.inProgressTasks = this.inProgressTasks.filter(t => t.id !== id);
   this.doneTasks = this.doneTasks.filter(t => t.id !== id);
 }
+
+dropToEditArea(event: CdkDragDrop<Task[]>): void {
+  if (event.previousContainer === event.container) {
+    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    return;
+  }
+
+  transferArrayItem(
+    event.previousContainer.data,
+    event.container.data,
+    event.previousIndex,
+    event.currentIndex
+  );
+}
+
+updateEditTaskTitle(task: Task, event: Event): void {
+  const element = event.target as HTMLElement;
+  task.title = element.textContent?.trim() ?? '';
+}
+saveEditTaskTitle(task: Task): void {
+
+  const trimmedTitle = task.title.trim();
+
+  if (!trimmedTitle) {
+    return;
+  }
+
+  this.todoService.updateTitle(task.id, trimmedTitle)
+    .subscribe({
+      next: updatedTask => {
+        task.title = updatedTask.title;
+      },
+      error: () => {
+        this.reload();
+      }
+    });
+}
+
+finishEdit(event: Event, task: Task): void {
+  event.preventDefault();
+  this.saveEditTaskTitle(task);
+  (event.target as HTMLElement).blur();
+}
+
+private updateTaskInAllLists(updatedTask: Task): void {
+  const allLists = [
+    this.todoTasks,
+    this.inProgressTasks,
+    this.doneTasks,
+    this.editTasks
+  ];
+
+  for (const list of allLists) {
+    const existingTask = list.find(task => task.id === updatedTask.id);
+    if (existingTask) {
+      existingTask.title = updatedTask.title;
+      existingTask.description = updatedTask.description;
+      existingTask.status = updatedTask.status;
+    }
+  }
+}
+
 }
 

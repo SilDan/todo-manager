@@ -86,6 +86,16 @@ public class TodoController {
         return repo.save(existing);
     }
 
+    @PatchMapping("/{id}/title")
+    public Todo updateTitle(
+            @PathVariable String id,
+            @RequestBody Map<String, String> body) {
+
+        Todo existing = repo.findById(id).orElseThrow();
+        existing.setTitle(body.get("title"));
+        return repo.save(existing);
+    }
+
     /**
      * Delete a todo item by its ID. This endpoint removes the specified todo item from the system. If the item with the given ID does not exist, an error will be thrown.
      * @param id The ID of the todo item to delete.
